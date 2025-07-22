@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AppCuidadoDePlantas" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Opcional: puedes agregar personalizaciones de color aquí -->
+    </style>
+</resources>
