@@ -1,5 +1,6 @@
 package cl.bentoroal.appcuidadodeplantas.ui
 
+import cl.bentoroal.appcuidadodeplantas.R
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
