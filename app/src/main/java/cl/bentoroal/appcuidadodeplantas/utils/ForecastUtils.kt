@@ -1,9 +1,7 @@
 package cl.bentoroal.appcuidadodeplantas.utils
 
-import cl.bentoroal.appcuidadodeplantas.model.ForecastItem
-import java.time.Instant
+import cl.bentoroal.appcuidadodeplantas.model.DailyWeatherData
 import java.time.LocalDate
-import java.time.ZoneId
 
 data class ResumenClimatico(
     val fecha: LocalDate,
@@ -14,23 +12,12 @@ data class ResumenClimatico(
 
 object ForecastUtils {
 
-    fun obtenerResumenPara(fecha: LocalDate, bloques: List<ForecastItem>): ResumenClimatico {
-        val bloquesDelDia = bloques.filter { item ->
-            val localDate = Instant.ofEpochSecond(item.dt)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-            localDate == fecha
-        }
-
-        val tempMin = bloquesDelDia.minOfOrNull { it.main.temp_min }
-        val tempMax = bloquesDelDia.maxOfOrNull { it.main.temp_max }
-        val vientoMax = bloquesDelDia.maxOfOrNull { it.wind.speed }
-
+    fun obtenerResumenPara(index: Int, daily: DailyWeatherData): ResumenClimatico {
+        val fecha = LocalDate.parse(daily.time[index])
         return ResumenClimatico(
             fecha = fecha,
-            tempMin = tempMin,
-            tempMax = tempMax,
-            vientoMax = vientoMax
+            tempMin = daily.temperature_2m_min.getOrNull(index),
+            tempMax = daily.temperature_2m_max.getOrNull(index),
+            vientoMax = daily.wind_speed_10m_max.getOrNull(index)
         )
-    }
-}
+    }}

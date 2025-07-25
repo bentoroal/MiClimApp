@@ -1,25 +1,14 @@
 package cl.bentoroal.appcuidadodeplantas
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.lifecycle.lifecycleScope
-import cl.bentoroal.appcuidadodeplantas.api.RetrofitInstance
-import cl.bentoroal.appcuidadodeplantas.ui.ConfigurationActivity
 import cl.bentoroal.appcuidadodeplantas.worker.WeatherWorker
-import cl.bentoroal.appcuidadodeplantas.utils.ForecastUtils
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneId
-import java.time.LocalDate
-
+import androidx.navigation.ui.setupWithNavController
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,64 +16,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        scheduleWeatherWorker() // 🌤️ Encolamos el worker al iniciar
+        // 🔄 Conectar navegación inferior con fragments
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
 
-        val btnConfig = findViewById<Button>(R.id.btnConfiguration)
-        btnConfig.setOnClickListener {
-            val intent = Intent(this, ConfigurationActivity::class.java)
-            startActivity(intent)
-        }
+        val navController = navHostFragment.navController
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav.setupWithNavController(navController)
 
-        val cardResumen = findViewById<View>(R.id.cardResumenUmbrales)
-        cardResumen.alpha = 0f
-        cardResumen.translationY = 80f
-
-        cardResumen.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setDuration(600)
-            .setStartDelay(300)
-            .start()
-
-        val txtResumen = findViewById<TextView>(R.id.txtResumenUmbrales)
-        txtResumen.alpha = 0f
-        txtResumen.animate()
-            .alpha(1f)
-            .setDuration(500)
-            .setStartDelay(700)
-            .start()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val prefs = getSharedPreferences("clima_prefs", MODE_PRIVATE)
-        val temp = prefs.getFloat("temp_min_alert", 0f)
-        val wind = prefs.getFloat("wind_max_alert", 30f)
-
-        val txtResumen = findViewById<TextView>(R.id.txtResumenUmbrales)
-        txtResumen.text = "🌡️ Alerta de helada: bajo ${temp} °C\n💨 Alerta de viento: sobre ${wind} km/h"
-
-        val cardResumen = findViewById<View>(R.id.cardResumenUmbrales)
-        cardResumen.scaleX = 0.9f
-        cardResumen.scaleY = 0.9f
-        cardResumen.alpha = 0f
-
-        cardResumen.animate()
-            .scaleX(1f)
-            .scaleY(1f)
-            .alpha(1f)
-            .setDuration(500)
-            .setStartDelay(100)
-            .start()
-
-        cargarPronosticoManana()
-
+        // 🌀 Iniciar el worker que consulta clima cada 6 horas
+        scheduleWeatherWorker()
     }
 
     private fun scheduleWeatherWorker() {
         val request = PeriodicWorkRequestBuilder<WeatherWorker>(
-            6, TimeUnit.HOURS // ⏰ cada 6 horas
+            6, TimeUnit.HOURS
         ).build()
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
@@ -92,38 +38,5 @@ class MainActivity : AppCompatActivity() {
             ExistingPeriodicWorkPolicy.UPDATE,
             request
         )
-    }
-    private fun cargarPronosticoManana() {
-        lifecycleScope.launch {
-            try {
-                val forecast = RetrofitInstance.api.getForecast(
-                    lat = -38.74,
-                    lon = -72.59,
-                    apiKey = getString(R.string.weather_api_key)
-                )
-
-                val bloques = forecast.list
-                val hoy = LocalDate.now()
-                val manana = hoy.plusDays(1)
-
-                val resumenHoy = ForecastUtils.obtenerResumenPara(hoy, bloques)
-                val resumenManana = ForecastUtils.obtenerResumenPara(manana, bloques)
-
-                val txtHoy = findViewById<TextView>(R.id.txtPronosticoHoy)
-                val txtManana = findViewById<TextView>(R.id.txtPronosticoManana)
-                val card = findViewById<View>(R.id.cardPronosticoManana)
-
-                txtHoy.text = "🌤️ Hoy (${resumenHoy.fecha}):\n🌡️ ${resumenHoy.tempMin}°C – ${resumenHoy.tempMax}°C\n💨 Viento: ${resumenHoy.vientoMax} km/h"
-                txtManana.text = "☀️ Mañana (${resumenManana.fecha}):\n🌡️ ${resumenManana.tempMin}°C – ${resumenManana.tempMax}°C\n💨 Viento: ${resumenManana.vientoMax} km/h"
-
-                card.visibility = View.VISIBLE
-                card.alpha = 0f
-                card.translationY = 40f
-                card.animate().alpha(1f).translationY(0f).setDuration(600).start()
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
     }
 }

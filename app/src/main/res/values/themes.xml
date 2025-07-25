@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AppCuidadoDePlantas" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Opcional: puedes agregar personalizaciones de color aquí -->
+    <style name="Theme.AppCuidadoDePlantas" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Colores y fuentes personalizadas opcionales -->
+        <item name="colorPrimary">@color/greenPrimary</item>
+        <item name="colorSecondary">@color/greenSecondary</item>
     </style>
 </resources>

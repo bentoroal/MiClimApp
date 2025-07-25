@@ -1,64 +1,65 @@
 package cl.bentoroal.appcuidadodeplantas.worker
 
-import android.content.Context
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import cl.bentoroal.appcuidadodeplantas.R
 import cl.bentoroal.appcuidadodeplantas.api.RetrofitInstance
 import cl.bentoroal.appcuidadodeplantas.notifications.NotificationHelper
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import cl.bentoroal.appcuidadodeplantas.utils.Thresholds
 
 class WeatherWorker(
     appContext: Context,
     params: WorkerParameters
 ) : CoroutineWorker(appContext, params) {
 
-    // Se utiliza SuppressLint para desactivar la advertencia "MissingPermission".
-    // La verificación del permiso POST_NOTIFICATIONS ya se realiza dentro de NotificationHelper,
-    // y el llamado a notify() está envuelto en try-catch. Esta anotación evita que Lint
-    // marque el uso como inseguro, manteniendo el código limpio sin duplicar verificaciones.
+    companion object {
+        private const val PREFS_NAME    = "clima_prefs"
+        private const val KEY_SAVED_LAT = "saved_lat"
+        private const val KEY_SAVED_LON = "saved_lon"
+    }
+
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
+        // Asegúrate de crear el canal de notificación
         NotificationHelper.createChannelIfNeeded(applicationContext)
 
-        val lat = -38.74   // Temuco 🌍
-        val lon = -72.59
-        val apiKey = applicationContext.getString(R.string.weather_api_key)
+        // 1. Lee las coords de SharedPreferences (o usa el default de Temuco)
+        val prefs = applicationContext
+            .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val defaultLat = -38.74f
+        val defaultLon = -72.59f
+        val lat = prefs.getFloat(KEY_SAVED_LAT, defaultLat).toDouble()
+        val lon = prefs.getFloat(KEY_SAVED_LON, defaultLon).toDouble()
+
+        // 2. Umbrales
+        val tempMinAlert = Thresholds.getMinTemp(applicationContext)
+        val windMaxAlert = Thresholds.getMaxWind(applicationContext)
 
         return try {
-            val response = RetrofitInstance.api.getForecast(lat, lon, apiKey = apiKey)
-            val prefs = applicationContext.getSharedPreferences("clima_prefs", Context.MODE_PRIVATE)
+            // 3. Llamada a la API
+            val response = RetrofitInstance.api.getDailyForecast(lat, lon)
+            val todayIndex = 0
 
-            val tempMinAlert = prefs.getFloat("temp_min_alert", 0f).toDouble()
-            val windMaxAlert = prefs.getFloat("wind_max_alert", 30f).toDouble()
+            val minTemp = response.daily.temperature_2m_min[todayIndex]
+            val maxTemp = response.daily.temperature_2m_max[todayIndex]
+            val maxWind = response.daily.wind_speed_10m_max[todayIndex]
 
-            val todayBlocks = response.list.filter { item ->
-                val localTime = Instant.ofEpochSecond(item.dt).atZone(ZoneId.systemDefault())
-                localTime.toLocalDate() == LocalDate.now()
-            }
-
-            val minTemp = todayBlocks.minOfOrNull { it.main.temp_min }
-            val maxTemp = todayBlocks.maxOfOrNull { it.main.temp_max }
-            val maxWind = todayBlocks.maxOfOrNull { it.wind.speed }
-
+            // 4. Construye alertas
             val alerts = mutableListOf<String>()
-
-            if (minTemp != null && minTemp <= tempMinAlert) {
-                alerts.add("❄️ Helada posible: ${minTemp} °C")
+            if (minTemp <= tempMinAlert) {
+                alerts.add("❄️ Helada posible: ${"%.1f".format(minTemp)} °C")
             }
-            if (maxWind != null && maxWind >= windMaxAlert) {
-                alerts.add("🌬️ Viento fuerte: ${maxWind} km/h")
+            if (maxWind >= windMaxAlert) {
+                alerts.add("🌬️ Viento fuerte: ${"%.1f".format(maxWind)} km/h")
             }
 
-            val baseMessage = "🌤️ Clima para hoy: ${minTemp}°C - ${maxTemp}°C"
+            // 5. Notificación
+            val baseMessage = "🌤️ Clima para hoy: ${"%.1f".format(minTemp)}°C - ${"%.1f".format(maxTemp)}°C"
             val finalMessage = if (alerts.isNotEmpty()) alerts.joinToString("\n") else baseMessage
-
             NotificationHelper.showNotification(applicationContext, finalMessage)
-            Result.success()
 
+            Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure()

@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/miClimaFragment"
+        android:icon="@drawable/ic_weather"
+        android:title="Mi Clima" />
+
+    <item
+        android:id="@+id/misPlantasFragment"
+        android:icon="@drawable/ic_leaf"
+        android:title="Mis Plantas" />
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="Ajustes" />
+</menu>
