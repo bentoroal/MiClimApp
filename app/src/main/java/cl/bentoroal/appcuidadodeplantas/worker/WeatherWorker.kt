@@ -41,9 +41,9 @@ class WeatherWorker(
             val response = RetrofitInstance.api.getDailyForecast(lat, lon)
             val todayIndex = 0
 
-            val minTemp = response.daily.temperature_2m_min[todayIndex]
-            val maxTemp = response.daily.temperature_2m_max[todayIndex]
-            val maxWind = response.daily.wind_speed_10m_max[todayIndex]
+            val minTemp = response.daily.temperatureMin[todayIndex]
+            val maxTemp = response.daily.temperatureMax[todayIndex]
+            val maxWind = response.daily.windSpeedMax[todayIndex]
 
             // 4. Construye alertas
             val alerts = mutableListOf<String>()

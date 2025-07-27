@@ -1,18 +1,32 @@
 package cl.bentoroal.appcuidadodeplantas.model
 
+import com.google.gson.annotations.SerializedName
+
 data class OpenMeteoResponse(
     val daily: DailyWeatherData,
-    val hourly: HourlyWeatherData
+    @SerializedName("current_weather")
+    val currentWeather: CurrentWeatherData?
 )
 
 data class DailyWeatherData(
     val time: List<String>,
-    val temperature_2m_min: List<Double>,
-    val temperature_2m_max: List<Double>,
-    val wind_speed_10m_max: List<Double>
+
+    @SerializedName("temperature_2m_min")
+    val temperatureMin: List<Double>,
+
+    @SerializedName("temperature_2m_max")
+    val temperatureMax: List<Double>,
+
+    @SerializedName("wind_speed_10m_max")
+    val windSpeedMax: List<Double>,
+
+    @SerializedName("weathercode")
+    val weatherCode: List<Int>
 )
 
-data class HourlyWeatherData(
-    val time: List<String>,
-    val temperature_2m: List<Double>
+data class CurrentWeatherData(
+    val temperature: Double,
+    val windspeed: Double,
+    val weathercode: Int,
+    val time: String
 )

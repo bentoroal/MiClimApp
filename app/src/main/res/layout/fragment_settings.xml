@@ -62,7 +62,7 @@
             android:layout_height="wrap_content" />
 
         <!-- 🔘 Switch para activar/desactivar alertas -->
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchActivarAlertas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

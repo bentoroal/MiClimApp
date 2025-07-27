@@ -21,67 +21,100 @@
             app:cardElevation="8dp"
             app:cardBackgroundColor="@color/white">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:padding="20dp"
+            <TableLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:stretchColumns="*">
 
-                <TextView
-                    android:id="@+id/txtClimaActualTitulo"
-                    android:text="🌡️ Estado Actual"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/greenText"
-                    android:layout_width="wrap_content"
+                <TableRow
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp" />
+                    android:weightSum="3">
 
-                <TextView
-                    android:id="@+id/txtClimaActualValores"
-                    android:text="Cargando..."
-                    android:textSize="16sp"
-                    android:textColor="@color/black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:id="@+id/imgClimaActualIcon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:adjustViewBounds="true"
+                        android:maxHeight="48dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_unknown" />
 
-        <!-- 📊 Resumen de alertas -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardResumenUmbrales"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="16dp"
-            app:cardBackgroundColor="@color/greenPrimary"
-            android:layout_marginBottom="16dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/txtTituloTempActual"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:gravity="center"
+                            android:text="Actual"
+                            android:textColor="@color/greenPrimary"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/txtResumenTitulo"
-                    android:text="🌿 Valores de Alerta"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp" />
+                        <TextView
+                            android:id="@+id/txtTempActual"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:gravity="center_vertical"
+                            android:text="🌡️ --°C"
+                            android:textColor="@color/greenPrimary"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/txtResumenUmbrales"
-                    android:text="Cargando valores..."
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="start|center_vertical">
+
+                        <TextView
+                            android:id="@+id/txtTempMin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Min: --°C"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/greenText" />
+
+                        <TextView
+                            android:id="@+id/txtTempMax"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Max: --°C"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/greenText" />
+
+                        <TextView
+                            android:id="@+id/txtVientoMax"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Viento -- km/h"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/greenText" />
+                    </LinearLayout>
+
+                </TableRow>
+            </TableLayout>
         </androidx.cardview.widget.CardView>
 
         <!-- ☀️ Pronóstico de mañana -->
@@ -121,19 +154,22 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+        <!-- 🗓 Pronóstico semanal -->
+        <TextView
+            android:id="@+id/txtSemanalTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Proximos días:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/greenText"
+            android:layout_marginBottom="8dp"/>
 
-        <!-- ⚙️ Botón de configuración -->
-        <Button
-            android:id="@+id/btnConfigAlerts"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvForecast"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⚙️ Configurar Alertas"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:backgroundTint="@color/greenPrimary"
-            android:paddingVertical="12dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp" />
+            android:overScrollMode="never"
+            android:layout_marginBottom="24dp"/>
     </LinearLayout>
 </ScrollView>
