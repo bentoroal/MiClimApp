@@ -1,15 +1,20 @@
 package cl.bentoroal.appcuidadodeplantas.utils
 
+import android.content.Context
 import cl.bentoroal.appcuidadodeplantas.R
 import cl.bentoroal.appcuidadodeplantas.model.CurrentWeather
 import cl.bentoroal.appcuidadodeplantas.model.DailyForecast
 import cl.bentoroal.appcuidadodeplantas.model.DailyWeatherData
 import cl.bentoroal.appcuidadodeplantas.model.CurrentWeatherData
+import cl.bentoroal.appcuidadodeplantas.model.Comuna
+import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.roundToInt
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 object WeatherUtils {
 
@@ -84,4 +89,17 @@ object WeatherUtils {
 
     fun Double?.toWindString(): String =
         this?.roundToInt()?.let { "$it km/h" } ?: "--"
+
+    // 4) Funcion para crear objetos de comunas desde el json
+    fun cargarComunasDesdeAssets(context: Context, fileName: String = "comunas_chile.json"): List<Comuna> {
+        val jsonString: String
+        try {
+            jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace() // Maneja el error apropiadamente
+            return emptyList()
+        }
+        val listComunaType = object : TypeToken<List<Comuna>>() {}.type
+        return Gson().fromJson(jsonString, listComunaType) ?: emptyList() // Asegura que no sea null
+    }
 }

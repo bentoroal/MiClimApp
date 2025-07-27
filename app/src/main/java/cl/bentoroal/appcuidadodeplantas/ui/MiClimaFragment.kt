@@ -13,6 +13,9 @@ import cl.bentoroal.appcuidadodeplantas.databinding.FragmentMiClimaBinding
 import cl.bentoroal.appcuidadodeplantas.ui.adapters.ForecastAdapter
 import cl.bentoroal.appcuidadodeplantas.utils.WeatherUtils
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 class MiClimaFragment : Fragment() {
 
@@ -53,11 +56,18 @@ class MiClimaFragment : Fragment() {
 
                 val hoy = forecasts.firstOrNull()
 
+                val dayName = LocalDate.now()
+                    .dayOfWeek
+                    .getDisplayName(TextStyle.FULL, Locale("es", "ES"))
+                    .replaceFirstChar { it.uppercase() }
+
+                binding.txtTituloClimaHoy.text = " $dayName"
+
                 if (hoy != null) {
                     // 1️⃣ Datos actuales
-                    binding.txtTempActual.text = "🌡️ ${currentWeather.temperature.toInt()}°C"
+                    binding.txtTempActual.text = "${currentWeather.temperature.toInt()}°C"
                     binding.imgClimaActualIcon.setImageResource(currentWeather.iconResId)
-
+                    binding.imgClimaActualIcon.setVisibility(View.VISIBLE)
                     // 2️⃣ Datos de hoy desde pronóstico
                     binding.txtTempMin.text = "Min: ${hoy.minTemp.toInt()}°C"
                     binding.txtTempMax.text = "Max: ${hoy.maxTemp.toInt()}°C"
