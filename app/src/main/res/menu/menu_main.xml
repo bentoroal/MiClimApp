@@ -5,11 +5,6 @@
         android:title="Mi Clima" />
 
     <item
-        android:id="@+id/misPlantasFragment"
-        android:icon="@drawable/ic_leaf"
-        android:title="Mis Plantas" />
-
-    <item
         android:id="@+id/settingsFragment"
         android:icon="@drawable/ic_settings"
         android:title="Ajustes" />

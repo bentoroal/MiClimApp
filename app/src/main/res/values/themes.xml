@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AppCuidadoDePlantas" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+    <style name="Theme.MiClimApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Colores y fuentes personalizadas opcionales -->
         <item name="colorPrimary">@color/greenPrimary</item>
         <item name="colorSecondary">@color/greenSecondary</item>
+        <item name="android:fontFamily">@font/misans</item>
     </style>
 </resources>

@@ -36,7 +36,7 @@
     <!-- 🌱 Título principal (si querés que sea global) -->
     <TextView
         android:id="@+id/txtTitulo"
-        android:text="🌱 Cuidado de Plantas"
+        android:text="MiClimApp"
         android:textSize="26sp"
         android:textStyle="bold"
         android:textColor="@color/greenText"
