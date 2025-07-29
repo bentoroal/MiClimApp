@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun scheduleWeatherWorker() {
         val request = PeriodicWorkRequestBuilder<WeatherWorker>(
-            6, TimeUnit.HOURS
+            12, TimeUnit.HOURS
         ).build()
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(

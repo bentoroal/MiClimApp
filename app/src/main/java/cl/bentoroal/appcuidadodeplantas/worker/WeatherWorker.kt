@@ -21,7 +21,7 @@ class WeatherWorker(
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
-        // Asegúrate de crear el canal de notificación
+        // Crear el canal de notificación
         NotificationHelper.createChannelIfNeeded(applicationContext)
 
         // 1. Lee las coords de SharedPreferences (o usa el default de Temuco)
@@ -39,25 +39,35 @@ class WeatherWorker(
         return try {
             // 3. Llamada a la API
             val response = RetrofitInstance.api.getDailyForecast(lat, lon)
+            val tomorrowIndex = 1
             val todayIndex = 0
+            // Variables para el dia actual:
+            val minTempToday = response.daily.temperatureMin[todayIndex]
+            val maxTempToday = response.daily.temperatureMax[todayIndex]
+            val maxWindToday = response.daily.windSpeedMax[todayIndex]
 
-            val minTemp = response.daily.temperatureMin[todayIndex]
-            val maxTemp = response.daily.temperatureMax[todayIndex]
-            val maxWind = response.daily.windSpeedMax[todayIndex]
+            // Variables para el dia siguiente:
+            val minTempTomorrow = response.daily.temperatureMin[tomorrowIndex]
+            val maxTempTomorrow = response.daily.temperatureMax[tomorrowIndex]
+            val maxWindTomorrow = response.daily.windSpeedMax[tomorrowIndex]
 
             // 4. Construye alertas
             val alerts = mutableListOf<String>()
-            if (minTemp <= tempMinAlert) {
-                alerts.add("❄️ Helada posible: ${"%.1f".format(minTemp)} °C")
+            if (minTempTomorrow <= tempMinAlert) {
+                alerts.add("❄️ Helada posible para mañana: ${"%.1f".format(minTempTomorrow)} °C")
             }
-            if (maxWind >= windMaxAlert) {
-                alerts.add("🌬️ Viento fuerte: ${"%.1f".format(maxWind)} km/h")
+            if (maxWindTomorrow >= windMaxAlert) {
+                alerts.add("🌬️ Mañana vientos de hasta: ${"%.1f".format(maxWindTomorrow)} km/h")
             }
 
             // 5. Notificación
-            val baseMessage = "🌤️ Clima para hoy: ${"%.1f".format(minTemp)}°C - ${"%.1f".format(maxTemp)}°C"
-            val finalMessage = if (alerts.isNotEmpty()) alerts.joinToString("\n") else baseMessage
-            NotificationHelper.showNotification(applicationContext, finalMessage)
+            val baseMessageToday = "🌤️ Clima para hoy: ${"%.1f".format(minTempTomorrow)}°C - ${"%.1f".format(maxTempTomorrow)}°C"
+            val finalMessageToday = if (alerts.isNotEmpty()) alerts.joinToString("\n") else baseMessageToday
+            val baseMessageTomorrow = "🌞 Clima para mañana: ${"%.1f".format(minTempTomorrow)}°C - ${"%.1f".format(maxTempTomorrow)}°C"
+            val finalMessageTomorrow = if (alerts.isNotEmpty()) alerts.joinToString("\n") else baseMessageTomorrow
+
+            NotificationHelper.showNotification(applicationContext, finalMessageToday)
+            NotificationHelper.showNotification(applicationContext, finalMessageTomorrow)
 
             Result.success()
         } catch (e: Exception) {
