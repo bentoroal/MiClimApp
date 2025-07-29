@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cl.bentoroal.appcuidadodeplantas">
+    package="cl.bentoroal.miclimapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Para obtener una ubicación aproximada (red móvil / Wi-Fi) -->
@@ -14,19 +14,20 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/AppCuidadoDePlantas"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/AppCuidadoDePlantas"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCuidadoDePlantas">
 
         <activity
-            android:name=".MainActivity"
+            android:name="cl.bentoroal.miclimapp.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name="cl.bentoroal.miclimapp.worker.WorkerLauncherReceiver" android:exported="false"/>
 
     </application>
 

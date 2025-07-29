@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "cl.bentoroal.appcuidadodeplantas"
+    namespace = "cl.bentoroal.miclimapp"
     compileSdk = 36
 
     val localProperties = Properties()
@@ -16,18 +16,11 @@ android {
         localProperties.load(FileInputStream(localPropertiesFile))
     }
     defaultConfig {
-        applicationId = "cl.bentoroal.appcuidadodeplantas"
+        applicationId = "cl.bentoroal.miclimapp"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        // Exponer la API Key como un recurso de String
-        resValue(
-            "string",
-            "weather_api_key", // El nombre que tendrá en R.string.weather_api_key
-            localProperties.getProperty("WEATHER_API_KEY", "TU_API_KEY_POR_DEFECTO_SI_NO_SE_ENCUENTRA")
-        )
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {

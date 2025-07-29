@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AppCuidadoDePlantas"
+rootProject.name = "MiClimApp"
 include(":app")
  

@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/miClimaFragment"
-        android:name="cl.bentoroal.appcuidadodeplantas.ui.MiClimaFragment"
+        android:name="cl.bentoroal.miclimapp.ui.MiClimaFragment"
         android:label="Mi Clima"
         tools:layout="@layout/fragment_mi_clima" />
 
     <fragment
         android:id="@+id/misPlantasFragment"
-        android:name="cl.bentoroal.appcuidadodeplantas.ui.MisPlantasFragment"
+        android:name="cl.bentoroal.miclimapp.ui.MisPlantasFragment"
         android:label="Mis Plantas"
         tools:layout="@layout/fragment_mis_plantas" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="cl.bentoroal.appcuidadodeplantas.ui.SettingsFragment"
+        android:name="cl.bentoroal.miclimapp.ui.SettingsFragment"
         android:label="Ajustes"
         tools:layout="@layout/fragment_settings" />
 
