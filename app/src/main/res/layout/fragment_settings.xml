@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/greenBackground"
+    android:background="?attr/colorSurface"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp">
@@ -11,24 +12,25 @@
 
         <!-- 🌍 Ajustes de Ubicación -->
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="🌍 Ajustes de Ubicación"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/greenText"
-            android:layout_marginBottom="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="16dp" />
 
-        <!-- 🔘 Switch GPS automático switch -->
+        <!-- 🔘 Switch GPS automático -->
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchUbicacionAutomatica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Activar ubicación automática"
             android:checked="true"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginBottom="24dp" />
 
+        <!-- 📍 Ubicación manual -->
         <TextView
             android:id="@+id/labelUbicacionManual"
             android:layout_width="wrap_content"
@@ -36,49 +38,47 @@
             android:text="Seleccionar ubicación manual"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/textSecondary"
+            android:textColor="?attr/colorPrimary"
             android:layout_marginBottom="8dp" />
 
-
-        <!-- 🏙️ Campo de ubicación manual -->
         <AutoCompleteTextView
             android:id="@+id/autocompleteUbicacionManual"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Ej: Temuco, Santiago, Estación Central"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
             android:padding="12dp"
             android:layout_marginBottom="32dp" />
 
-        <!-- 🌿 Configuración de Alertas Climáticas -->
+        <!-- 🌿 Alertas Climáticas -->
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="🌿 Alertas Climáticas"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/greenText"
-            android:layout_marginBottom="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="16dp" />
 
-        <!-- 🔘 Switch para activar/desactivar alertas -->
+        <!-- 🔘 Switch activar/desactivar alertas -->
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchActivarAlertas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Activar alertas de clima"
             android:checked="true"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginBottom="24dp" />
 
         <!-- 🌡️ Temperatura mínima de alerta -->
         <TextView
-            android:text="Temperatura mínima de alerta (°C)"
-            android:textColor="@color/greenText"
-            android:textStyle="bold"
-            android:textSize="16sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Temperatura mínima de alerta (°C)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
             android:layout_marginBottom="8dp" />
 
         <SeekBar
@@ -91,21 +91,21 @@
 
         <TextView
             android:id="@+id/txtTempMinValor"
-            android:text="0 °C"
-            android:textColor="@color/textSecondary"
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="0 °C"
+            android:textSize="14sp"
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="24dp" />
 
         <!-- 💨 Viento máximo antes de alerta -->
         <TextView
-            android:text="Viento máximo antes de alerta (km/h)"
-            android:textColor="@color/greenText"
-            android:textStyle="bold"
-            android:textSize="16sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Viento máximo antes de alerta (km/h)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
             android:layout_marginBottom="8dp" />
 
         <SeekBar
@@ -117,26 +117,26 @@
 
         <TextView
             android:id="@+id/txtWindMaxValor"
-            android:text="30 km/h"
-            android:textColor="@color/textSecondary"
-            android:textSize="14sp"
-            android:layout_marginBottom="32dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="30 km/h"
+            android:textSize="14sp"
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="32dp" />
 
         <!-- 🌿 Botón para guardar -->
         <Button
             android:id="@+id/btnGuardarPreferencias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Guardar Preferencias"
             android:textAllCaps="false"
             android:textSize="18sp"
-            android:textColor="@android:color/white"
-            android:backgroundTint="@color/greenPrimary"
+            android:textColor="?attr/colorOnPrimary"
+            android:backgroundTint="?attr/colorPrimary"
             android:drawableStart="@drawable/ic_leafy"
             android:drawablePadding="8dp"
             android:padding="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginBottom="32dp" />
 
     </LinearLayout>

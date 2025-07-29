@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="Theme.MiClimApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Colores y fuentes personalizadas opcionales -->
-        <item name="colorPrimary">@color/greenPrimary</item>
-        <item name="colorSecondary">@color/greenSecondary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/onPrimary</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/onSurface</item>
         <item name="android:fontFamily">@font/misans</item>
     </style>
 </resources>
