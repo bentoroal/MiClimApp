@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="surface">#121212</color>
-    <color name="onSurface">#ECECEC</color>
-    <color name="primary">#A5D6A7</color>
-    <color name="onPrimary">#000000</color>
+    <color name="surface">#102027</color>        <!-- fondo gris azul oscuro -->
+    <color name="onSurface">#ECEFF1</color>      <!-- texto claro -->
+    <color name="primary">#81D4FA</color>        <!-- acento celeste suave -->
+    <color name="onPrimary">#000000</color>      <!-- texto sobre celeste -->
 </resources>

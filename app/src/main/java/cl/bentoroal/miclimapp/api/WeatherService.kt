@@ -1,4 +1,4 @@
-package cl.bentoroal.miclimapp.api // ajusta según tu paquete
+package cl.bentoroal.miclimapp.api
 
 import cl.bentoroal.miclimapp.model.OpenMeteoResponse
 import retrofit2.http.GET
@@ -24,8 +24,9 @@ interface WeatherService {
         @Query("latitude")  lat: Double,
         @Query("longitude") lon: Double,
         @Query("daily")
-        daily: String = "temperature_2m_min,temperature_2m_max,wind_speed_10m_max,weathercode",
-        @Query("timezone") timezone: String = "auto"
+        daily: String = "temperature_2m_min,temperature_2m_max,wind_speed_10m_max,weathercode,precipitation_probability_max",
+        @Query("timezone")
+        timezone: String = "America/Santiago"
     ): OpenMeteoResponse
 
     @GET("v1/forecast")

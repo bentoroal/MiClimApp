@@ -19,19 +19,12 @@ import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.switchmaterial.SwitchMaterial
+import cl.bentoroal.miclimapp.BuildConfig
 import cl.bentoroal.miclimapp.R
 import cl.bentoroal.miclimapp.model.Comuna
-import cl.bentoroal.miclimapp.utils.WeatherUtils
-import cl.bentoroal.miclimapp.utils.PREFS_NAME
-import cl.bentoroal.miclimapp.utils.KEY_AUTO_LOCATION
-import cl.bentoroal.miclimapp.utils.KEY_MANUAL_LOCATION
-import cl.bentoroal.miclimapp.utils.KEY_ALERTS_ENABLED
-import cl.bentoroal.miclimapp.utils.KEY_TEMP_MIN
-import cl.bentoroal.miclimapp.utils.KEY_WIND_MAX
-import cl.bentoroal.miclimapp.utils.KEY_SAVED_LAT
-import cl.bentoroal.miclimapp.utils.KEY_SAVED_LON
-
+import cl.bentoroal.miclimapp.utils.*
 import java.text.Normalizer
+import java.text.SimpleDateFormat
 import java.util.*
 
 class SettingsFragment : Fragment() {
@@ -43,27 +36,28 @@ class SettingsFragment : Fragment() {
     private lateinit var fusedClient: FusedLocationProviderClient
     private lateinit var autoComplete: AutoCompleteTextView
     private lateinit var autoAdapter: ArrayAdapter<String>
-
     private lateinit var todasLasComunas: List<Comuna>
     private lateinit var comunasMapByName: Map<String, Comuna>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Cargar las comunas usando la función de WeatherUtils
         todasLasComunas = WeatherUtils.cargarComunasDesdeAssets(requireContext())
-        comunasMapByName = todasLasComunas.associateBy { it.nombre.normalizeForSearch() } // Normaliza la clave si buscas con normalización
+        comunasMapByName = todasLasComunas.associateBy { it.nombre.normalizeForSearch() }
         Log.d("SettingsFragment", "Comunas cargadas: ${todasLasComunas.size}")
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         fusedClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
+        // Referencias a vistas
         autoComplete = view.findViewById(R.id.autocompleteUbicacionManual)
         val switchLocation = view.findViewById<SwitchMaterial>(R.id.switchUbicacionAutomatica)
         val switchAlerts = view.findViewById<SwitchMaterial>(R.id.switchActivarAlertas)
@@ -72,16 +66,12 @@ class SettingsFragment : Fragment() {
         val txtTemp = view.findViewById<TextView>(R.id.txtTempMinValor)
         val txtWind = view.findViewById<TextView>(R.id.txtWindMaxValor)
         val btnGuardar = view.findViewById<Button>(R.id.btnGuardarPreferencias)
+        val txtHistorial = view.findViewById<TextView>(R.id.txtUltimaNotificacion)
 
-        // Usa las constantes globales importadas
-        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = requireContext()
+            .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-        // Configuración del AutoCompleteTextView
-        autoAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, mutableListOf<String>())
-        autoComplete.setAdapter(autoAdapter)
-        autoComplete.threshold = 1
-
-        // Cargar preferencias guardadas
+        // Carga inicial de preferencias
         val autoEnabled = prefs.getBoolean(KEY_AUTO_LOCATION, true)
         switchLocation.isChecked = autoEnabled
         autoComplete.isEnabled = !autoEnabled
@@ -90,24 +80,27 @@ class SettingsFragment : Fragment() {
         switchAlerts.isChecked = prefs.getBoolean(KEY_ALERTS_ENABLED, true)
         seekTemp.isEnabled = switchAlerts.isChecked
         seekWind.isEnabled = switchAlerts.isChecked
-        seekTemp.progress = prefs.getInt(KEY_TEMP_MIN, 0)
-        seekWind.progress = prefs.getInt(KEY_WIND_MAX, 30)
+        seekTemp.progress = prefs.getFloat(KEY_TEMP_MIN, 0f).toInt()
+        seekWind.progress = prefs.getFloat(KEY_WIND_MAX, 30f).toInt()
         txtTemp.text = "${seekTemp.progress} °C"
         txtWind.text = "${seekWind.progress} km/h"
 
-        // Listeners
+        // Configuración de auto-complete
+        autoAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            mutableListOf()
+        )
+        autoComplete.setAdapter(autoAdapter)
+        autoComplete.threshold = 1
+
+        // Listeners y flujos de UI...
 
         switchLocation.setOnCheckedChangeListener { _, isChecked ->
             autoComplete.isEnabled = !isChecked
             if (isChecked) {
                 ensureLocationPermission()
-                autoComplete.setText("") // Limpiar texto manual
-                // Opcional: Limpiar SharedPreferences de ubicación manual
-                // prefs.edit {
-                //    remove(KEY_SAVED_LAT)
-                //    remove(KEY_SAVED_LON)
-                //    remove(KEY_MANUAL_LOCATION)
-                // }
+                autoComplete.setText("")
             }
         }
 
@@ -116,7 +109,6 @@ class SettingsFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!autoComplete.isEnabled) return
-
                 val query = s.toString().trim()
                 if (query.length >= autoComplete.threshold) {
                     val suggestions = filtrarComunas(query)
@@ -134,21 +126,19 @@ class SettingsFragment : Fragment() {
         })
 
         autoComplete.setOnItemClickListener { _, _, position, _ ->
-            val nombreSeleccionado = autoAdapter.getItem(position)
-            nombreSeleccionado?.let { nombreComuna ->
-                val comunaSeleccionada = comunasMapByName[nombreComuna.normalizeForSearch()] ?: todasLasComunas.find { it.nombre.equals(nombreComuna, ignoreCase = true) }
-
-                comunaSeleccionada?.let { comuna ->
+            autoAdapter.getItem(position)?.let { nombre ->
+                val comuna = comunasMapByName[nombre.normalizeForSearch()]
+                    ?: todasLasComunas.find { it.nombre.equals(nombre, true) }
+                comuna?.let {
                     prefs.edit {
-                        putString(KEY_MANUAL_LOCATION, comuna.nombre)
-                        putFloat(KEY_SAVED_LAT, comuna.latitud.toFloat())
-                        putFloat(KEY_SAVED_LON, comuna.longitud.toFloat())
-                        putBoolean(KEY_AUTO_LOCATION, false) // Desactivar auto al elegir manual
+                        putString(KEY_MANUAL_LOCATION, it.nombre)
+                        putFloat(KEY_SAVED_LAT, it.latitud.toFloat())
+                        putFloat(KEY_SAVED_LON, it.longitud.toFloat())
+                        putBoolean(KEY_AUTO_LOCATION, false)
                     }
-                    switchLocation.isChecked = false // Actualizar switch
-                    autoComplete.isEnabled = true // Asegurar que siga habilitado si se seleccionó
-
-                    Toast.makeText(requireContext(), "Ubicación manual: ${comuna.nombre}", Toast.LENGTH_SHORT).show()
+                    switchLocation.isChecked = false
+                    autoComplete.isEnabled = true
+                    Toast.makeText(requireContext(), "Ubicación manual: ${it.nombre}", Toast.LENGTH_SHORT).show()
                     hideKeyboard()
                     autoComplete.clearFocus()
                 }
@@ -180,24 +170,67 @@ class SettingsFragment : Fragment() {
 
         btnGuardar.setOnClickListener {
             prefs.edit {
-                // La ubicación (auto/manual) y sus detalles ya se guardan en sus respectivos listeners
                 putBoolean(KEY_ALERTS_ENABLED, switchAlerts.isChecked)
-                putInt(KEY_TEMP_MIN, seekTemp.progress)
-                putInt(KEY_WIND_MAX, seekWind.progress)
+                putFloat(KEY_TEMP_MIN, seekTemp.progress.toFloat())
+                putFloat(KEY_WIND_MAX, seekWind.progress.toFloat())
+                apply()
             }
             Toast.makeText(requireContext(), "🌿 Ajustes de alertas guardados", Toast.LENGTH_SHORT).show()
+        }
+
+        // ─── Historial de notificaciones (solo en DEBUG) ───
+        if (BuildConfig.DEBUG) {
+            txtHistorial.visibility = View.VISIBLE
+
+            val lastMessage = prefs.getString("last_notification_message", null)
+            val lastTime = prefs.getLong("last_notification_time", 0L)
+
+            if (lastMessage != null && lastTime > 0) {
+                val formattedTime = SimpleDateFormat(
+                    "dd MMM yyyy HH:mm",
+                    Locale("es", "ES")
+                ).format(Date(lastTime))
+
+                txtHistorial.text = """
+                    🕒 Última notificación:
+                    $formattedTime
+
+                    $lastMessage
+                """.trimIndent()
+            } else {
+                txtHistorial.text = "No se ha enviado ninguna notificación aún."
+            }
+        } else {
+            txtHistorial.visibility = View.GONE
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION) {
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                saveCurrentGpsLocation()
+            } else {
+                Toast.makeText(requireContext(), "Permiso de ubicación denegado.", Toast.LENGTH_SHORT).show()
+                view?.findViewById<SwitchMaterial>(R.id.switchUbicacionAutomatica)?.isChecked = false
+            }
         }
     }
 
     private fun filtrarComunas(query: String): List<String> {
-        if (query.isBlank() || !::todasLasComunas.isInitialized || todasLasComunas.isEmpty()) {
-            return emptyList()
-        }
-        val queryNormalized = query.normalizeForSearch()
+        if (query.isBlank() || todasLasComunas.isEmpty()) return emptyList()
+        val qNorm = query.normalizeForSearch()
         return todasLasComunas
-            .filter { comuna ->
-                comuna.nombre.normalizeForSearch().contains(queryNormalized)
-            }
+            .filter { it.nombre.normalizeForSearch().contains(qNorm) }
             .map { it.nombre }
             .distinct()
             .take(10)
@@ -205,7 +238,9 @@ class SettingsFragment : Fragment() {
 
     private fun String.normalizeForSearch(): String {
         val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
-        return Regex("\\p{InCombiningDiacriticalMarks}+").replace(normalized, "").lowercase(Locale.getDefault())
+        return Regex("\\p{InCombiningDiacriticalMarks}+")
+            .replace(normalized, "")
+            .lowercase(Locale.getDefault())
     }
 
     private fun hideKeyboard() {
@@ -217,7 +252,8 @@ class SettingsFragment : Fragment() {
         val fine = Manifest.permission.ACCESS_FINE_LOCATION
         val coarse = Manifest.permission.ACCESS_COARSE_LOCATION
         if (ContextCompat.checkSelfPermission(requireContext(), fine) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireContext(), coarse) != PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(requireContext(), coarse) != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(fine, coarse), REQUEST_LOCATION)
         } else {
             saveCurrentGpsLocation()
@@ -225,55 +261,23 @@ class SettingsFragment : Fragment() {
     }
 
     private fun saveCurrentGpsLocation() {
-        val fine = Manifest.permission.ACCESS_FINE_LOCATION
-        val coarse = Manifest.permission.ACCESS_COARSE_LOCATION
-        val hasFine = ContextCompat.checkSelfPermission(requireContext(), fine) == PackageManager.PERMISSION_GRANTED
-        val hasCoarse = ContextCompat.checkSelfPermission(requireContext(), coarse) == PackageManager.PERMISSION_GRANTED
-
-        if (hasFine || hasCoarse) {
-            try {
-                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Log.w("SettingsFragment", "saveCurrentGpsLocation llamado sin permisos, esto no debería pasar.")
-                    return
-                }
-                fusedClient.lastLocation.addOnSuccessListener { loc ->
-                    loc?.let {
-                        requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
-                            putFloat(KEY_SAVED_LAT, it.latitude.toFloat())
-                            putFloat(KEY_SAVED_LON, it.longitude.toFloat())
-                            remove(KEY_MANUAL_LOCATION) // Limpiar la ubicación manual guardada
-                        }
-                        autoComplete.setText("") // Limpiar el campo de texto
-                        Log.d("SettingsFragment", "Ubicación GPS guardada. Manual borrada.")
-                    } ?: run {
-                        Log.w("SettingsFragment", "FusedLocationProviderClient.lastLocation devolvió null.")
-                        Toast.makeText(requireContext(), "No se pudo obtener la ubicación actual.", Toast.LENGTH_SHORT).show()
+        try {
+            fusedClient.lastLocation.addOnSuccessListener { loc ->
+                loc?.let {
+                    requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
+                        putFloat(KEY_SAVED_LAT, it.latitude.toFloat())
+                        putFloat(KEY_SAVED_LON, it.longitude.toFloat())
+                        remove(KEY_MANUAL_LOCATION)
                     }
-                }.addOnFailureListener { e ->
-                    Log.e("SettingsFragment", "Error al obtener última ubicación", e)
-                    Toast.makeText(requireContext(), "Error al obtener ubicación: ${e.message}", Toast.LENGTH_SHORT).show()
+                    autoComplete.setText("")
+                } ?: run {
+                    Toast.makeText(requireContext(), "No se pudo obtener la ubicación actual.", Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: SecurityException) { // Aunque el check de arriba debería prevenir esto
-                Log.e("SettingsFragment", "SecurityException en saveCurrentGpsLocation", e)
-                Toast.makeText(requireContext(), "Error de seguridad al acceder a la ubicación.", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error al obtener ubicación: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Toast.makeText(requireContext(), "Permisos de ubicación no disponibles.", Toast.LENGTH_SHORT).show()
-        }
-    }
-    // No olvides manejar el resultado de requestPermissions en onRequestPermissionsResult
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_LOCATION) {
-            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                // Permiso concedido
-                saveCurrentGpsLocation()
-            } else {
-                // Permiso denegado
-                Toast.makeText(requireContext(), "Permiso de ubicación denegado.", Toast.LENGTH_SHORT).show()
-                // Quizás quieras desmarcar el switch de ubicación automática si el permiso es denegado
-                view?.findViewById<SwitchMaterial>(R.id.switchUbicacionAutomatica)?.isChecked = false
-            }
+        } catch (e: SecurityException) {
+            Toast.makeText(requireContext(), "Error de seguridad al acceder a la ubicación.", Toast.LENGTH_SHORT).show()
         }
     }
 }

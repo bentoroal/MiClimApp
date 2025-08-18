@@ -41,13 +41,15 @@ object WeatherUtils {
             // 2.3) Icono según weatherCode
             val code = daily.weatherCode.getOrNull(idx) ?: -1
             val icon = when (code) {
-                0               -> R.drawable.ic_sunny
-                in 1..3         -> R.drawable.ic_cloudy
-                45, 48          -> R.drawable.ic_foggy
+                0 -> R.drawable.ic_sunny
+                1, 3 -> R.drawable.ic_cloudy
+                2 -> R.drawable.ic_partly_cloudy
+                45, 48 -> R.drawable.ic_foggy
                 in 51..55, in 61..65, in 80..82 -> R.drawable.ic_rainy
-                71,73,75        -> R.drawable.ic_snowy
-                in 95..99       -> R.drawable.ic_stormy
-                else            -> R.drawable.ic_unknown
+                71, 73, 75 -> R.drawable.ic_snowy
+                in 95..96 -> R.drawable.ic_rainy
+                in 97..99 -> R.drawable.ic_stormy
+                else -> R.drawable.ic_unknown
             }
 
             DailyForecast(
@@ -55,7 +57,8 @@ object WeatherUtils {
                 iconResId = icon,
                 minTemp   = minT,
                 maxTemp   = maxT,
-                maxWind   = wind
+                maxWind   = wind,
+
             )
         }
 
@@ -67,13 +70,15 @@ object WeatherUtils {
 
         // 2️⃣ Icono visual según weatherCode
         val icon = when (code) {
-            0               -> R.drawable.ic_sunny
-            in 1..3         -> R.drawable.ic_cloudy
-            45, 48          -> R.drawable.ic_foggy
+            0 -> R.drawable.ic_sunny
+            1, 3 -> R.drawable.ic_cloudy
+            2 -> R.drawable.ic_partly_cloudy
+            45, 48 -> R.drawable.ic_foggy
             in 51..55, in 61..65, in 80..82 -> R.drawable.ic_rainy
-            71, 73, 75      -> R.drawable.ic_snowy
-            in 95..99       -> R.drawable.ic_stormy
-            else            -> R.drawable.ic_unknown
+            71, 73, 75 -> R.drawable.ic_snowy
+            in 95..96 -> R.drawable.ic_rainy
+            in 97..99 -> R.drawable.ic_stormy
+            else -> R.drawable.ic_unknown
         }
 
         // 3️⃣ Mapeo a modelo visual

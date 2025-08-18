@@ -8,4 +8,3 @@ const val KEY_TEMP_MIN = "temp_min_alert"
 const val KEY_WIND_MAX = "wind_max_alert"
 const val KEY_SAVED_LAT = "saved_lat"
 const val KEY_SAVED_LON = "saved_lon"
-// Puedes dejar REQUEST_LOCATION en el companion object de SettingsFragment si solo se usa allí.

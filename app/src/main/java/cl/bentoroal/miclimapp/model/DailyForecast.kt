@@ -5,5 +5,5 @@ data class DailyForecast(
     val iconResId: Int,
     val minTemp: Int,
     val maxTemp: Int,
-    val maxWind: Int
+    val maxWind: Int,
 )

@@ -7,7 +7,7 @@
     android:layout_marginVertical="4dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="?attr/colorSurface"
+    app:cardBackgroundColor="?attr/colorOnPrimary"
     app:strokeColor="?attr/colorOnSurface"
     app:strokeWidth="1dp"
     app:useCompatPadding="true">
@@ -17,7 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp">
-
 
         <ImageView
             android:id="@+id/imgWeatherIcon"
@@ -32,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Lunes"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:textColor="?attr/colorPrimary"
             android:gravity="center" />
 

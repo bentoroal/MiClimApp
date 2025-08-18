@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "cl.bentoroal.miclimapp"
-    compileSdk = 36
+    compileSdk = 34
 
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -18,16 +18,21 @@ android {
     defaultConfig {
         applicationId = "cl.bentoroal.miclimapp"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
         viewBinding=true
+        buildConfig = true
     }
 
     buildTypes {
+        debug {
+            // Esto es opcional, pero ayuda a evitar confusiones
+            isDebuggable = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -36,6 +41,7 @@ android {
             )
         }
     }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -60,6 +66,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.play.services.location)
     testImplementation(libs.junit)
+    implementation(libs.androidx.work.runtime.ktx.v291)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 

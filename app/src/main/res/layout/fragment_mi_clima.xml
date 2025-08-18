@@ -1,158 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    android:padding="24dp">
+
+    <!-- 🌡️ Clima actual -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardClimaActual"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="?attr/colorOnPrimary"
+        app:strokeColor="?attr/colorOnSurface"
+        app:strokeWidth="1dp"
+        app:useCompatPadding="true">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!-- 🌡️ Clima actual -->
-        <com.google.android.material.card.MaterialCardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/cardClimaActual"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="?attr/colorSurface"
-            app:strokeColor="?attr/colorOnSurface"
-            app:strokeWidth="1dp"
-            app:useCompatPadding="true">
+            android:orientation="vertical"
+            android:padding="8dp">
 
-            <LinearLayout
+            <!-- Encabezado dinámico -->
+            <TextView
+                android:id="@+id/txtTituloClimaHoy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="8dp"
+                android:text="Clima de hoy"
+                android:textSize="26sp"
+                android:textStyle="normal"
+                android:textColor="?attr/colorPrimary" />
+
+            <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="6dp"
+                android:stretchColumns="*">
 
-                <!-- Encabezado dinámico -->
-                <TextView
-                    android:id="@+id/txtTituloClimaHoy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Clima de hoy"
-                    android:textSize="24sp"
-                    android:textStyle="normal"
-                    android:textColor="?attr/colorPrimary" />
-
-                <TableLayout
+                <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="6dp"
-                    android:stretchColumns="*">
+                    android:weightSum="3">
 
-                    <TableRow
-                        android:layout_width="match_parent"
+                    <ImageView
+                        android:id="@+id/imgClimaActualIcon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:adjustViewBounds="true"
+                        android:maxHeight="48dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_unknown"
+                        android:visibility="invisible" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="vertical"
+                        android:gravity="start">
+
+                        <TextView
+                            android:id="@+id/txtTituloTempActual"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:layout_gravity="center"
+                            android:text="Actual"
+                            android:textSize="20sp"
+                            android:textStyle="normal"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:id="@+id/txtTempActual"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:layout_gravity="center"
+                            android:text="🌡--°C"
+                            android:textSize="24sp"
+                            android:textStyle="normal"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:weightSum="3">
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="start|center_vertical">
 
-                        <ImageView
-                            android:id="@+id/imgClimaActualIcon"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:adjustViewBounds="true"
-                            android:maxHeight="48dp"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_unknown"
-                            android:visibility="invisible" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp"
-                            android:orientation="vertical"
-                            android:gravity="start">
-
-                            <TextView
-                                android:id="@+id/txtTituloTempActual"
-                                android:layout_width="wrap_content"
-                                android:layout_height="0dp"
-                                android:layout_weight="2"
-                                android:layout_gravity="center"
-                                android:text="Actual"
-                                android:textSize="20sp"
-                                android:textStyle="normal"
-                                android:textColor="?attr/colorPrimary" />
-
-                            <TextView
-                                android:id="@+id/txtTempActual"
-                                android:layout_width="wrap_content"
-                                android:layout_height="0dp"
-                                android:layout_weight="2"
-                                android:layout_gravity="center"
-                                android:text="🌡--°C"
-                                android:textSize="24sp"
-                                android:textStyle="normal"
-                                android:textColor="?attr/colorPrimary" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/txtTempMin"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="start|center_vertical">
+                            android:text="Min: --°C"
+                            android:textSize="14sp"
+                            android:textStyle="normal"
+                            android:textColor="?attr/colorOnSurface" />
 
-                            <TextView
-                                android:id="@+id/txtTempMin"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Min: --°C"
-                                android:textSize="14sp"
-                                android:textStyle="normal"
-                                android:textColor="?attr/colorOnSurface" />
+                        <TextView
+                            android:id="@+id/txtTempMax"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Max: --°C"
+                            android:textSize="14sp"
+                            android:textStyle="normal"
+                            android:textColor="?attr/colorOnSurface" />
 
-                            <TextView
-                                android:id="@+id/txtTempMax"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Max: --°C"
-                                android:textSize="14sp"
-                                android:textStyle="normal"
-                                android:textColor="?attr/colorOnSurface" />
-
-                            <TextView
-                                android:id="@+id/txtVientoMax"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Viento -- km/h"
-                                android:textSize="14sp"
-                                android:textStyle="normal"
-                                android:textColor="?attr/colorOnSurface" />
-                        </LinearLayout>
-                    </TableRow>
-                </TableLayout>
-            </LinearLayout>
+                        <TextView
+                            android:id="@+id/txtVientoMax"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Viento -- km/h"
+                            android:textSize="14sp"
+                            android:textStyle="normal"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
 
         <!-- ☀️ Pronóstico de mañana -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardPronosticoManana"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/cardClimaActual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:visibility="gone"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             app:cardCornerRadius="12dp"
             app:cardElevation="6dp"
             app:cardBackgroundColor="?attr/colorSurface">
 
-            <LinearLayout
+    <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -188,13 +187,24 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="?attr/colorPrimary"
-            android:layout_marginBottom="8dp"/>
+            app:layout_constraintTop_toBottomOf="@id/cardPronosticoManana"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvForecast"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never"
-            android:layout_marginBottom="24dp"/>
-    </LinearLayout>
-</ScrollView>
+    <!-- 📅 RecyclerView semanal (6 elementos fijos) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvForecast"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtSemanalTitulo"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="surface">#FFFFFF</color>
-    <color name="onSurface">#000000</color>
-    <color name="primary">#2E7D32</color>
-    <color name="onPrimary">#FFFFFF</color>
+    <color name="surface">#F0FBFF</color>       <!-- fondo general (celeste claro) -->
+    <color name="onSurface">#01579B</color>     <!-- texto y elementos oscuros -->
+    <color name="primary">#4FC3F7</color>       <!-- acento celeste vibrante -->
+    <color name="onPrimary">#FFFFFF</color>     <!-- texto sobre el acento -->
+    <color name="surfaceVariant">#81D4FA</color>
+    <color name="outline">#4FC3F7</color>
 </resources>

@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <permission android:name="cl.bentoroal.miclimapp.permission.INTERNAL"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MiClimApp">
+        android:theme="@style/Theme.MiClimApp"
+        android:name=".MyApp"
+        >
 
         <activity
             android:name="cl.bentoroal.miclimapp.MainActivity"
@@ -25,7 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="cl.bentoroal.miclimapp.worker.WorkerLauncherReceiver" android:exported="false"/>
 
     </application>
 

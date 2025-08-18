@@ -1,82 +1,131 @@
 package cl.bentoroal.miclimapp.worker
 
-import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
+import androidx.core.content.edit
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import cl.bentoroal.miclimapp.api.RetrofitInstance
 import cl.bentoroal.miclimapp.notifications.NotificationHelper
-import cl.bentoroal.miclimapp.utils.Thresholds
+import cl.bentoroal.miclimapp.utils.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.UnknownHostException
+import java.util.*
 
 class WeatherWorker(
-    appContext: Context,
-    params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+    context: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(context, workerParams) {
 
     companion object {
-        private const val PREFS_NAME    = "clima_prefs"
-        private const val KEY_SAVED_LAT = "saved_lat"
-        private const val KEY_SAVED_LON = "saved_lon"
+        private const val TAG = "WeatherWorker"
     }
 
-    @SuppressLint("MissingPermission")
-    override suspend fun doWork(): Result {
-        // Crear el canal de notificación
-        NotificationHelper.createChannelIfNeeded(applicationContext)
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        Log.d(TAG, "🚀 doWork START (CoroutineWorker)")
 
-        // 1. Lee las coords de SharedPreferences (o usa el default de Temuco)
-        val prefs = applicationContext
-            .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val defaultLat = -38.74f
-        val defaultLon = -72.59f
-        val lat = prefs.getFloat(KEY_SAVED_LAT, defaultLat).toDouble()
-        val lon = prefs.getFloat(KEY_SAVED_LON, defaultLon).toDouble()
+        try {
+            NotificationHelper.createChannelIfNeeded(applicationContext)
 
-        // 2. Umbrales
-        val tempMinAlert = Thresholds.getMinTemp(applicationContext)
-        val windMaxAlert = Thresholds.getMaxWind(applicationContext)
+            val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val lat = prefs.getFloat(KEY_SAVED_LAT, -999f).toDouble()
+            val lon = prefs.getFloat(KEY_SAVED_LON, -999f).toDouble()
 
-        return try {
-            // 3. Llamada a la API
+            // Validación de coordenadas válidas
+            if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+                Log.e(TAG, "❌ Coordenadas inválidas: lat=$lat, lon=$lon. Cancelando worker.")
+                return@withContext Result.failure()
+            }
+
+            val tempMinAlert = Thresholds.getMinTemp(applicationContext)
+            val windMaxAlert = Thresholds.getMaxWind(applicationContext)
+
+            Log.d(TAG, "🌍 Llamando API con lat=$lat, lon=$lon")
             val response = RetrofitInstance.api.getDailyForecast(lat, lon)
-            val tomorrowIndex = 1
+            val daily = response.daily
+
+            val isMorningWorker = tags.contains("WeatherWorker8AM")
             val todayIndex = 0
-            // Variables para el dia actual:
-            val minTempToday = response.daily.temperatureMin[todayIndex]
-            val maxTempToday = response.daily.temperatureMax[todayIndex]
-            val maxWindToday = response.daily.windSpeedMax[todayIndex]
+            val tomorrowIndex = 1
 
-            // Variables para el dia siguiente:
-            val minTempTomorrow = response.daily.temperatureMin[tomorrowIndex]
-            val maxTempTomorrow = response.daily.temperatureMax[tomorrowIndex]
-            val maxWindTomorrow = response.daily.windSpeedMax[tomorrowIndex]
+            val index = if (isMorningWorker) todayIndex else tomorrowIndex
 
-            // 4. Construye alertas
+            // Validar índices para evitar errores
+            if (index >= daily.temperatureMin.size ||
+                index >= daily.temperatureMax.size ||
+                index >= daily.windSpeedMax.size) {
+                Log.e(TAG, "❌ Índice fuera de rango para los datos diarios: $index")
+                return@withContext Result.failure()
+            }
+
+            // Mensaje base según el día
+            val baseMessage = if (isMorningWorker) {
+                "☀️ Hoy: Min %.1f°C - Max %.1f°C".format(
+                    daily.temperatureMin[todayIndex],
+                    daily.temperatureMax[todayIndex]
+                )
+            } else {
+                "☀️ Mañana: Min %.1f°C - Max %.1f°C".format(
+                    daily.temperatureMin[tomorrowIndex],
+                    daily.temperatureMax[tomorrowIndex]
+                )
+            }
+
             val alerts = mutableListOf<String>()
-            if (minTempTomorrow <= tempMinAlert) {
-                alerts.add("❄️ Helada posible para mañana: ${"%.1f".format(minTempTomorrow)} °C")
+
+            // Evaluar helada
+            if (daily.temperatureMin[index] <= tempMinAlert)
+                alerts.add("❄️ Helada posible: %.1f°C".format(daily.temperatureMin[index]))
+
+            // Evaluar viento
+            val vientoMaxDia = daily.windSpeedMax[index]
+            Log.d(TAG, "💨 Viento máximo del día [$index]: $vientoMaxDia km/h")
+
+            if (vientoMaxDia >= windMaxAlert)
+                alerts.add("🌬️ Viento fuerte: %.1f km/h".format(vientoMaxDia))
+
+            // Mensaje final
+            val finalMessage = if (alerts.isNotEmpty()) {
+                "⚠️ Alertas:\n${alerts.joinToString("\n")}\n\n📋 Pronóstico:\n$baseMessage"
+            } else {
+                "📋 Pronóstico:\n$baseMessage"
             }
-            if (maxWindTomorrow >= windMaxAlert) {
-                alerts.add("🌬️ Mañana vientos de hasta: ${"%.1f".format(maxWindTomorrow)} km/h")
+
+
+            NotificationHelper.showNotification(applicationContext, finalMessage)
+
+            val log = buildString {
+                appendLine("🕒 ${Date()}")
+                appendLine("🎯 Worker: ${tags.joinToString()}")
+                appendLine("📍 Coordenadas: lat=$lat, lon=$lon")
+                appendLine("💨 Viento: %.1f km/h".format(daily.windSpeedMax[index]))
+                appendLine("🌡️ Temperaturas: min=%.1f°C, max=%.1f°C".format(daily.temperatureMin[index], daily.temperatureMax[index]))
+                if (alerts.isNotEmpty()) {
+                    appendLine("⚠️ Alertas:")
+                    alerts.forEach { appendLine("- $it") }
+                }
+                appendLine("📋 Pronóstico mostrado:")
+                appendLine(baseMessage)
             }
 
-            // 5. Notificación
-            val baseMessageToday = "🌤️ Clima para hoy: ${"%.1f".format(minTempTomorrow)}°C - ${"%.1f".format(maxTempToday)}°C"
-            val finalMessageToday = if (alerts.isNotEmpty()) alerts.joinToString("\n") else baseMessageToday
-            val baseMessageTomorrow = "🌞 Clima para mañana: ${"%.1f".format(minTempTomorrow)}°C - ${"%.1f".format(maxTempTomorrow)}°C"
-            val finalMessageTomorrow = if (alerts.isNotEmpty()) alerts.joinToString("\n") else baseMessageTomorrow
-
-            val hora = inputData.getInt("hora", -1)
-
-            when (hora) {
-                8 -> NotificationHelper.showNotification(applicationContext, finalMessageToday)
-                20 -> NotificationHelper.showNotification(applicationContext, finalMessageTomorrow)
+            prefs.edit {
+                putString("weather_worker_log", log)
+                putString("last_notification_message", finalMessage)
+                putLong("last_notification_time", System.currentTimeMillis())
             }
 
+
+            Log.d(TAG, "✅ Notificación enviada con éxito.")
             Result.success()
+
+        } catch (e: UnknownHostException) {
+            Log.w(TAG, "🌐 Sin conexión de red, se reintentará.", e)
+            Result.retry()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "❌ Error inesperado en doWork()", e)
             Result.failure()
         }
     }
+
 }

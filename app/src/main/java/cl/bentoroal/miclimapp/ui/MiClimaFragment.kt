@@ -43,38 +43,43 @@ class MiClimaFragment : Fragment() {
             adapter = forecastAdapter
         }
 
-        // 2) Cargar datos
-        lifecycleScope.launch {
+        // 2) Cargar datos en una coroutine atada al viewLifecycleOwner
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Si la vista ya se destruyó, salimos
+            val safeBinding = _binding ?: return@launch
+
             try {
-                val prefs = requireContext().getSharedPreferences("clima_prefs", Context.MODE_PRIVATE)
+                val prefs = requireContext()
+                    .getSharedPreferences("clima_prefs", Context.MODE_PRIVATE)
                 val lat = prefs.getFloat("saved_lat", -38.74f).toDouble()
                 val lon = prefs.getFloat("saved_lon", -72.59f).toDouble()
+
                 val respForecasts = RetrofitInstance.api.getDailyForecast(lat, lon)
-                val respCurrentWeather = RetrofitInstance.api.getCurrentWeather(lat, lon)
+                val respCurrent = RetrofitInstance.api.getCurrentWeather(lat, lon)
+
                 val forecasts = WeatherUtils.toDailyForecasts(respForecasts.daily)
-                val currentWeather = WeatherUtils.toCurrentWeather(respCurrentWeather.currentWeather)
+                val current = WeatherUtils.toCurrentWeather(respCurrent.currentWeather)
 
                 val hoy = forecasts.firstOrNull()
-
                 val dayName = LocalDate.now()
                     .dayOfWeek
                     .getDisplayName(TextStyle.FULL, Locale("es", "ES"))
                     .replaceFirstChar { it.uppercase() }
 
-                binding.txtTituloClimaHoy.text = " $dayName"
+                safeBinding.txtTituloClimaHoy.text = " $dayName"
 
                 if (hoy != null) {
-                    // 1️⃣ Datos actuales
-                    binding.txtTempActual.text = "${currentWeather.temperature.toInt()}°C"
-                    binding.imgClimaActualIcon.setImageResource(currentWeather.iconResId)
-                    binding.imgClimaActualIcon.setVisibility(View.VISIBLE)
-                    // 2️⃣ Datos de hoy desde pronóstico
-                    binding.txtTempMin.text = "Min: ${hoy.minTemp.toInt()}°C"
-                    binding.txtTempMax.text = "Max: ${hoy.maxTemp.toInt()}°C"
-                    binding.txtVientoMax.text = "Viento: ${hoy.maxWind.toInt()} km/h"
+                    safeBinding.txtTempActual.text = "${current.temperature.toInt()}°C"
+                    safeBinding.imgClimaActualIcon.apply {
+                        setImageResource(current.iconResId)
+                        visibility = View.VISIBLE
+                    }
 
-                    // 3️⃣ Animación suave
-                    binding.cardClimaActual.apply {
+                    safeBinding.txtTempMin.text = "Min: ${hoy.minTemp.toInt()}°C"
+                    safeBinding.txtTempMax.text = "Max: ${hoy.maxTemp.toInt()}°C"
+                    safeBinding.txtVientoMax.text = "Viento: ${hoy.maxWind.toInt()} km/h"
+
+                    safeBinding.cardClimaActual.apply {
                         alpha = 0f
                         scaleX = 0.9f
                         scaleY = 0.9f
@@ -83,7 +88,7 @@ class MiClimaFragment : Fragment() {
                         .setDuration(500)
                         .start()
                 } else {
-                    binding.txtTempActual.text = "Datos no disponibles"
+                    safeBinding.txtTempActual.text = "Datos no disponibles"
                 }
 
                 // 4) Actualizar RecyclerView con los próximos 7 días
@@ -91,8 +96,9 @@ class MiClimaFragment : Fragment() {
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                binding.txtTempActual.text = "Error al cargar pronóstico"
-                binding.rvForecast.visibility = View.GONE
+                val b = _binding ?: return@launch
+                b.txtTempActual.text = "Error al cargar pronóstico"
+                b.rvForecast.visibility = View.GONE
             }
         }
     }

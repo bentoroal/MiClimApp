@@ -21,7 +21,7 @@ data class DailyWeatherData(
     val windSpeedMax: List<Double>,
 
     @SerializedName("weathercode")
-    val weatherCode: List<Int>
+    val weatherCode: List<Int>,
 )
 
 data class CurrentWeatherData(
