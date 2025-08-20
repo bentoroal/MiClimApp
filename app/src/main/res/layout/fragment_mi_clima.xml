@@ -23,7 +23,7 @@
         app:strokeWidth="1dp"
         app:useCompatPadding="true">
 
-    <LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -107,7 +107,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Min: --°C"
-                            android:textSize="14sp"
+                            android:textSize="12sp"
                             android:textStyle="normal"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -117,7 +117,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Max: --°C"
-                            android:textSize="14sp"
+                            android:textSize="12sp"
                             android:textStyle="normal"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -127,84 +127,40 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Viento -- km/h"
-                            android:textSize="14sp"
+                            android:textSize="12sp"
                             android:textStyle="normal"
                             android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
                 </TableRow>
             </TableLayout>
         </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
 
-        <!-- ☀️ Pronóstico de mañana -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardPronosticoManana"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cardClimaActual"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:visibility="gone"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="?attr/colorSurface">
+    <!-- 🗓 Pronóstico semanal -->
+    <TextView
+        android:id="@+id/txtSemanalTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Próximos días:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/cardClimaActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"/>
 
-    <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/txtPronosticoHoy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="🌤️ Hoy: --°C – --°C\n💨 Viento: -- km/h"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorPrimary" />
-
-                <TextView
-                    android:id="@+id/txtPronosticoManana"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="☀️ Mañana: --°C – --°C\n💨 Viento: -- km/h"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorPrimary" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- 🗓 Pronóstico semanal -->
-        <TextView
-            android:id="@+id/txtSemanalTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Próximos días:"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/cardPronosticoManana"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"/>
-
-    <!-- 📅 RecyclerView semanal (6 elementos fijos) -->
+    <!-- 📅 RecyclerView semanal -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvForecast"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
         android:overScrollMode="never"
         android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtSemanalTitulo"
-        app:layout_constraintVertical_bias="0.0" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,6 +30,7 @@ import cl.bentoroal.miclimapp.worker.WeatherWorker
 import cl.bentoroal.miclimapp.worker.WeatherWorkerScheduler
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import cl.bentoroal.miclimapp.ui.MiClimaFragment
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -101,20 +102,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-//    private fun scheduleTestWeatherWorker(context: Context) {
-//        val workRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
-//            .setInitialDelay(1, TimeUnit.MINUTES)
-//            .addTag("WeatherWorkerTestNow")
-//            .build()
-//
-//        WorkManager.getInstance(context).enqueue(workRequest)
-//        Log.d("WM", "🧪 Test Worker enqueued id=${workRequest.id}")
-//
-//        WorkManager.getInstance(context).getWorkInfoByIdLiveData(workRequest.id).observe(this) { info ->
-//            Log.d("WM", "Test Worker state=${info.state}")
-//        }
-//    }
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -148,13 +135,24 @@ class MainActivity : AppCompatActivity() {
                         putFloat(KEY_SAVED_LAT, location.latitude.toFloat())
                         putFloat(KEY_SAVED_LON, location.longitude.toFloat())
                     }
+
+                    // 🔄 Forzar refresco del fragmento si está visible
+                    val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                    val currentFragment = (navHost as? NavHostFragment)
+                        ?.childFragmentManager
+                        ?.fragments
+                        ?.firstOrNull()
+
+                    if (currentFragment is MiClimaFragment) {
+                        currentFragment.reloadWeather()
+                    }
                 }
             }
         } catch (e: SecurityException) {
-            // Por si acaso, manejar la excepción (aunque no debería pasar porque verificaste)
             Log.e("MainActivity", "Permiso de ubicación no concedido al intentar obtener ubicación", e)
         }
     }
+
 
 
 

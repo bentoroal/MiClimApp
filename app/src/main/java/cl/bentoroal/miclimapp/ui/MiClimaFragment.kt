@@ -36,24 +36,33 @@ class MiClimaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1) Inicializar RecyclerView
+        // Inicializar RecyclerView
         forecastAdapter = ForecastAdapter(emptyList())
         binding.rvForecast.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = forecastAdapter
         }
 
-        // 2) Cargar datos en una coroutine atada al viewLifecycleOwner
+        // Cargar clima al entrar por primera vez
+        reloadWeather()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reintenta cargar cada vez que se vuelve al fragmento
+        reloadWeather()
+    }
+
+    fun reloadWeather() {
         viewLifecycleOwner.lifecycleScope.launch {
-            // Si la vista ya se destruyó, salimos
             val safeBinding = _binding ?: return@launch
 
-            try {
-                val prefs = requireContext()
-                    .getSharedPreferences("clima_prefs", Context.MODE_PRIVATE)
-                val lat = prefs.getFloat("saved_lat", -38.74f).toDouble()
-                val lon = prefs.getFloat("saved_lon", -72.59f).toDouble()
+            val prefs = requireContext()
+                .getSharedPreferences("clima_prefs", Context.MODE_PRIVATE)
+            val lat = prefs.getFloat("saved_lat", -999f).toDouble()
+            val lon = prefs.getFloat("saved_lon", -999f).toDouble()
 
+            try {
                 val respForecasts = RetrofitInstance.api.getDailyForecast(lat, lon)
                 val respCurrent = RetrofitInstance.api.getCurrentWeather(lat, lon)
 
@@ -91,14 +100,10 @@ class MiClimaFragment : Fragment() {
                     safeBinding.txtTempActual.text = "Datos no disponibles"
                 }
 
-                // 4) Actualizar RecyclerView con los próximos 7 días
                 forecastAdapter.update(forecasts.take(7))
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                val b = _binding ?: return@launch
-                b.txtTempActual.text = "Error al cargar pronóstico"
-                b.rvForecast.visibility = View.GONE
             }
         }
     }

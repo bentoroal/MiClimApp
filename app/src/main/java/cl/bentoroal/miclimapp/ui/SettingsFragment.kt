@@ -66,7 +66,6 @@ class SettingsFragment : Fragment() {
         val txtTemp = view.findViewById<TextView>(R.id.txtTempMinValor)
         val txtWind = view.findViewById<TextView>(R.id.txtWindMaxValor)
         val btnGuardar = view.findViewById<Button>(R.id.btnGuardarPreferencias)
-        val txtHistorial = view.findViewById<TextView>(R.id.txtUltimaNotificacion)
 
         val prefs = requireContext()
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -176,32 +175,6 @@ class SettingsFragment : Fragment() {
                 apply()
             }
             Toast.makeText(requireContext(), "🌿 Ajustes de alertas guardados", Toast.LENGTH_SHORT).show()
-        }
-
-        // ─── Historial de notificaciones (solo en DEBUG) ───
-        if (BuildConfig.DEBUG) {
-            txtHistorial.visibility = View.VISIBLE
-
-            val lastMessage = prefs.getString("last_notification_message", null)
-            val lastTime = prefs.getLong("last_notification_time", 0L)
-
-            if (lastMessage != null && lastTime > 0) {
-                val formattedTime = SimpleDateFormat(
-                    "dd MMM yyyy HH:mm",
-                    Locale("es", "ES")
-                ).format(Date(lastTime))
-
-                txtHistorial.text = """
-                    🕒 Última notificación:
-                    $formattedTime
-
-                    $lastMessage
-                """.trimIndent()
-            } else {
-                txtHistorial.text = "No se ha enviado ninguna notificación aún."
-            }
-        } else {
-            txtHistorial.visibility = View.GONE
         }
     }
 

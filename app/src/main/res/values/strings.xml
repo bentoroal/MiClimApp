@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MiClimApp</string>
+    <string name="logo_description">Logo de MiClimApp que tiene el texto del nombre y una imagen de sol y nube de fondo</string>
 </resources>

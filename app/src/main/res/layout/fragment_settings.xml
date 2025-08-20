@@ -124,16 +124,6 @@
             android:textColor="?attr/colorPrimary"
             android:layout_marginBottom="32dp" />
 
-        <TextView
-            android:id="@+id/txtUltimaNotificacion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Última notificación: N/A"
-            android:visibility="invisible"
-            android:textSize="14sp"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginBottom="16dp" />
-
         <!-- 🌿 Botón para guardar -->
         <Button
             android:id="@+id/btnGuardarPreferencias"
@@ -144,7 +134,6 @@
             android:textSize="18sp"
             android:textColor="?attr/colorOnPrimary"
             android:backgroundTint="?attr/colorPrimary"
-            android:drawableStart="@drawable/ic_leafy"
             android:drawablePadding="8dp"
             android:padding="12dp"
             android:layout_marginBottom="32dp" />
