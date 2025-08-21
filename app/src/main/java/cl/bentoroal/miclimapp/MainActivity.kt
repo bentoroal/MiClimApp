@@ -25,13 +25,8 @@ import cl.bentoroal.miclimapp.notifications.NotificationHelper
 import cl.bentoroal.miclimapp.utils.KEY_SAVED_LAT
 import cl.bentoroal.miclimapp.utils.KEY_SAVED_LON
 import cl.bentoroal.miclimapp.utils.isBatteryOptimizationEnabled
-import cl.bentoroal.miclimapp.utils.DeviceUtils.showBatterySettings
-import cl.bentoroal.miclimapp.worker.WeatherWorker
 import cl.bentoroal.miclimapp.worker.WeatherWorkerScheduler
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import cl.bentoroal.miclimapp.ui.MiClimaFragment
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         NotificationHelper.createChannelIfNeeded(this)
+        WeatherWorkerScheduler.scheduleDailyWorkers(applicationContext)
 
         val perms = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -98,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setupWithNavController((navHost as NavHostFragment).navController)
 
         // Mostrar diálogo de batería solo una vez
-        checkBatteryOptimizationOnce()
+        // checkBatteryOptimizationOnce()
 
     }
 
